@@ -190,8 +190,8 @@ cython_debug/
 
 # Ruff stuff:
 .ruff_cache/
-
-# PyPI configuration file
+/
+#/ PyPI configuration file
 .pypirc
 
 # Cursor
@@ -200,8 +200,13 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+.context/
 
 # Marimo
 marimo/_static/
-marimo/_lsp/
+уarimo/_lsp/
 __marimo__/
+
+# other
+.env
+gpt_tryout/
