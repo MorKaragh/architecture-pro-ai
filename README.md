@@ -27,7 +27,7 @@
 Нужны для работы с Yandex:
 - `YANDEX_CLOUD_FOLDER`
 - `YANDEX_CLOUD_API_KEY`
-- `YANDEX_IAM_TOKEN` (нужен для индексации в task_3/task_5, если нет `YANDEX_CLOUD_API_KEY`)
+- `YANDEX_IAM_TOKEN` 
 
 ## Запуск бота
 
