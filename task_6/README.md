@@ -62,6 +62,7 @@ pip install -r task_3/requirements.txt
 2. Добавьте новый `*.txt` в папку источника.
 3. Запустите индексирование повторно.
 4. Проверьте `task_6/logs/index_update.jsonl` — появятся `files_added_or_updated > 0` и рост `chunks_added`.
+5. Для артефакта в репозитории используйте пример сохранённой записи: `task_6/index_update_sample.jsonl`.
 
 Пример команды для внешнего источника:
 
