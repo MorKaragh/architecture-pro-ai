@@ -18,6 +18,7 @@ DEFAULT_CHROMA_PATH = REPO_ROOT / "databases" / "good" / "chroma_db"
 PROMPTS_DIR = TASK_4_ROOT / "prompts"
 COLLECTION_NAME = "knowledge_base"
 TOP_K = 5
+MAX_TOP_DISTANCE = 0.75
 EMBED_URL = "https://ai.api.cloud.yandex.net:443/foundationModels/v1/textEmbedding"
 
 YANDEX_CLOUD_MODEL = os.getenv("YANDEX_CLOUD_MODEL", "yandexgpt-lite")
@@ -203,6 +204,38 @@ def _post_filter_and_sanitize(
     return filtered_docs, filtered_metas
 
 
+def _select_consistent_context(
+    docs: list[str],
+    metas: list[dict],
+    distances: list[float] | None,
+) -> tuple[list[str], list[dict]]:
+    """
+    Уменьшает смешение фактов из разных сущностей:
+    если первый (самый релевантный) чанк имеет title, оставляем
+    только чанки с тем же title (когда их >= 2).
+    """
+    if not docs or not metas:
+        return docs, metas
+
+    top_title = (metas[0] or {}).get("title")
+    if not top_title:
+        return docs, metas
+
+    filtered_docs: list[str] = []
+    filtered_metas: list[dict] = []
+    for doc, meta in zip(docs, metas):
+        meta = meta or {}
+        if meta.get("title") == top_title:
+            filtered_docs.append(doc)
+            filtered_metas.append(meta)
+
+    # Для сущностных вопросов лучше опираться на один надёжный источник,
+    # чем смешивать несколько разных персонажей.
+    if len(filtered_docs) >= 1:
+        return filtered_docs, filtered_metas
+    return docs, metas
+
+
 def answer(
     user_query: str,
     top_k: int = TOP_K,
@@ -224,6 +257,7 @@ def answer(
         return "Я не знаю"
     docs = results["documents"][0]
     metas = results["metadatas"][0]
+    distances = results.get("distances", [[]])[0]
 
     system_extra: str | None = None
     if defense not in {"off", "protected"}:
@@ -238,6 +272,13 @@ def answer(
         # Post-pроверка: выкидываем подозрительные чанки и чистим конструкции.
         docs, metas = _post_filter_and_sanitize(docs, metas)
 
+    # Если retrieval нерелевантный (все дистанции слишком большие) — лучше честно отказаться.
+    if distances and min(float(d) for d in distances) > MAX_TOP_DISTANCE:
+        return "В базе не найдено достаточно релевантных фрагментов. Я не знаю."
+
+    # Для сущностных вопросов избегаем смешения нескольких персонажей в одном ответе.
+    docs, metas = _select_consistent_context(docs, metas, distances)
+
     if not docs:
         return "В базе не найдено подходящих фрагментов. Я не знаю."
 
@@ -247,7 +288,7 @@ def answer(
         response = client.responses.create(
             model=f"gpt://{YANDEX_CLOUD_FOLDER}/{YANDEX_CLOUD_MODEL}",
             input=prompt,
-            temperature=0.4,
+            temperature=0.1,
             max_output_tokens=2048,
         )
         raw_text = response.output[0].content[0].text
