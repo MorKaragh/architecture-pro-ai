@@ -6,7 +6,7 @@ rectangle "cron (или планировщик)" as Cron
 rectangle "update_index.py" as Script
 rectangle "Чанкинг" as Chunker
 rectangle "Эмбеддинги" as Embeddings
-rectangle "ChromaDB\nonline: task_3/chroma_db\ncollection: knowledge_base\nstub: task_6/chroma_db_stub" as Index
+rectangle "ChromaDB\nonline: databases/good/chroma_db\ncollection: knowledge_base\nstub: task_6/chroma_db_stub" as Index
 rectangle "Логи\n(task_6/logs/index_update.jsonl)" as Logs
 
 Cron --> Script : запускает задачу (например, каждый день 06:00)

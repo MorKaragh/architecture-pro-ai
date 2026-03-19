@@ -14,9 +14,7 @@ from openai import OpenAI
 # --- Конфигурация ---
 TASK_4_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = TASK_4_ROOT.parent
-_DEFAULT_CHROMA_PATH = REPO_ROOT / "task_3" / "chroma_db"
-# Можно переопределить для task_5, чтобы бот использовал копию индекса.
-CHROMA_PATH = Path(os.getenv("CHROMA_PATH", str(_DEFAULT_CHROMA_PATH)))
+DEFAULT_CHROMA_PATH = REPO_ROOT / "databases" / "good" / "chroma_db"
 PROMPTS_DIR = TASK_4_ROOT / "prompts"
 COLLECTION_NAME = "knowledge_base"
 TOP_K = 5
@@ -67,9 +65,10 @@ def get_embedding(text: str, text_type: str = "doc") -> np.ndarray:
     return np.array(resp.json()["embedding"], dtype="float32")
 
 
-def search(query: str, top_k: int = TOP_K) -> dict:
+def search(query: str, db_path: Path | None = None, top_k: int = TOP_K) -> dict:
     """Поиск по индексу task_3: эмбеддинг запроса (query) + ChromaDB."""
-    client = chromadb.PersistentClient(path=str(CHROMA_PATH))
+    effective_db_path = db_path or DEFAULT_CHROMA_PATH
+    client = chromadb.PersistentClient(path=str(effective_db_path))
     collection = client.get_collection(name=COLLECTION_NAME)
     query_embedding = get_embedding(query, text_type="query").tolist()
     return collection.query(
@@ -204,7 +203,12 @@ def _post_filter_and_sanitize(
     return filtered_docs, filtered_metas
 
 
-def answer(user_query: str, top_k: int = TOP_K, defense: str = "off") -> str:
+def answer(
+    user_query: str,
+    top_k: int = TOP_K,
+    defense: str = "off",
+    db_path: Path | None = None,
+) -> str:
     """
     Полный RAG: поиск чанков → сборка промпта из шаблонов → вызов YandexGPT → нормализация ответа.
     """
@@ -213,7 +217,7 @@ def answer(user_query: str, top_k: int = TOP_K, defense: str = "off") -> str:
         return "Задайте, пожалуйста, вопрос."
 
     try:
-        results = search(query, top_k=top_k)
+        results = search(query, db_path=db_path, top_k=top_k)
     except Exception:
         # Если поиск не смог выполнить эмбеддинг/запрос (например, сеть/доступ),
         # отвечаем стандартно: "не знаю", не выбрасывая исключение в интерфейс.

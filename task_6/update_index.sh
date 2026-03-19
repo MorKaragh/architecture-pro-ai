@@ -9,7 +9,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 cd "${REPO_ROOT}"
 
-VENV_PY="${REPO_ROOT}/task_3/venv/bin/python"
+VENV_PY="${REPO_ROOT}/venv/bin/python"
 if [ -x "${VENV_PY}" ]; then
   "${VENV_PY}" "task_6/update_index.py" "$@"
 else

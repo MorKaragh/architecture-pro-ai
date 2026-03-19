@@ -1,7 +1,7 @@
 # Лог выполнения
 
 Источник “злонамеренного” документа проиндексирован в копию ChromaDB:
-- индекс: `task_5/chroma_db`
+- индекс: `databases/bad/chroma_db`
 - скрипт: `task_5/index_malicious_doc.py`
 - бот: `task_4/bot.py`
 

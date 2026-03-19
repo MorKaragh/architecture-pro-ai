@@ -4,7 +4,7 @@
 
 ## Зависимости
 
-- Индекс и эмбеддинги из **task_3** (ChromaDB в `task_3/chroma_db/`, эмбеддинги — Yandex API).
+- Индекс и эмбеддинги из **task_3** (ChromaDB в `databases/good/chroma_db/`, эмбеддинги — Yandex API).
 - Вызов LLM — как в **gpt_tryout/index.py** (OpenAI-совместимый клиент, Yandex Cloud).
 
 ## Как запустить

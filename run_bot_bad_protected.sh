@@ -2,10 +2,10 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DB_PATH="${ROOT_DIR}/databases/bad/chroma_db"
 
-export CHROMA_PATH="${ROOT_DIR}/task_5/chroma_db"
-
-"${ROOT_DIR}/task_4/venv/bin/python" \
+"${ROOT_DIR}/venv/bin/python" \
   "${ROOT_DIR}/task_4/bot.py" \
+  --db-path "${DB_PATH}" \
   --defense protected
 

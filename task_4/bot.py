@@ -30,12 +30,24 @@ def _parse_defense_mode(argv: list[str]) -> str:
     return "off"
 
 
+def _parse_db_path(argv: list[str]) -> Path | None:
+    """Поддержка параметра пути к базе: --db-path /abs/or/relative/path."""
+    if "--db-path" in argv:
+        idx = argv.index("--db-path")
+        if idx + 1 < len(argv):
+            return Path(argv[idx + 1]).expanduser().resolve()
+    return None
+
+
 def main():
     print("RAG-бот по базе знаний «Половник, выводящий из запоя».")
     print("Задавайте вопросы. Пустая строка или 'выход' / 'exit' — завершение.\n")
 
     defense = _parse_defense_mode(sys.argv)
+    db_path = _parse_db_path(sys.argv)
     print(f"Режим защиты: {defense}")
+    if db_path is not None:
+        print(f"Путь к базе: {db_path}")
     print("Команды: /defense off | /defense protected\n")
 
     while True:
@@ -59,7 +71,7 @@ def main():
             continue
 
         try:
-            print("Бот:", answer(user_input, defense=defense))
+            print("Бот:", answer(user_input, defense=defense, db_path=db_path))
         except Exception as e:
             print("Бот: Ошибка:", e)
         print()

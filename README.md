@@ -9,15 +9,15 @@
    - Подготовлен набор документов `task_2/final_fandom/` (исходные `.txt`, которые используются для индексации).
 
 3. `task_3` — векторный индекс
-   - Скрипт `task_3/build_index.py` строит ChromaDB в `task_3/chroma_db/` на основе документов из `task_2/final_fandom/`.
+   - Скрипт `task_3/build_index.py` строит ChromaDB в `databases/good/chroma_db/` на основе документов из `task_2/final_fandom/`.
 
 4. `task_4` — RAG-бот (few-shot)
    - Реализован пайплайн RAG: поиск по ChromaDB + сборка промпта по шаблонам из `task_4/prompts/` + генерация ответа через YandexGPT.
    - Запуск: консольный REPL `task_4/bot.py` (режим защиты включается параметром `--defense off|protected`).
 
 5. `task_5` — демонстрация prompt-injection и защит
-   - Сделана копия индекса: `task_3/chroma_db` -> `task_5/chroma_db` (оригинальная база не портится).
-   - Добавлен “злонамеренный” документ `task_5/malicious_doc.txt`, он проиндексирован скриптом `task_5/index_malicious_doc.py` в `task_5/chroma_db`.
+   - Сделана отдельная “плохая” база: `databases/bad/chroma_db` (оригинальная good-база не портится).
+   - Добавлен “злонамеренный” документ `task_5/malicious_doc.txt`, он проиндексирован скриптом `task_5/index_malicious_doc.py` в `databases/bad/chroma_db`.
    - В `task_4/rag.py` добавлены режимы:
      - `off` — без защит: демонстрирует уязвимость (бот может вывести `swordfish`).
      - `protected` — Pre-prompt + post-filter/sanitization: подозрительные чанки отбрасываются, утечка не происходит.
@@ -32,9 +32,9 @@
 ## Запуск бота
 
 Используйте удобные скрипты в корне:
-- `./run_bot_normal.sh` — нормальная база (`task_3/chroma_db`), режим `--defense off`
-- `./run_bot_bad_protected.sh` — плохая база (`task_5/chroma_db`), безопасный режим `--defense protected`
-- `./run_bot_bad_unsafe.sh` — плохая база (`task_5/chroma_db`), небезопасный режим `--defense off`
+- `./run_bot_normal.sh` — нормальная база (`databases/good/chroma_db`), режим `--defense off`
+- `./run_bot_bad_protected.sh` — плохая база (`databases/bad/chroma_db`), безопасный режим `--defense protected`
+- `./run_bot_bad_unsafe.sh` — плохая база (`databases/bad/chroma_db`), небезопасный режим `--defense off`
 
 Перед запуском task_5 при необходимости можно (однократно) переиндексировать “злонамеренный” документ:
 - `task_5/venv/bin/python task_5/index_malicious_doc.py`

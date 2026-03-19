@@ -3,21 +3,22 @@
 Запуск: python query_example.py "ваш запрос"
 Или без аргумента — выполняются тестовые запросы из списка.
 """
-import sys
+import argparse
 from pathlib import Path
 
 import chromadb
 
 from embedding_client import get_embedding
 
-CHROMA_PATH = Path(__file__).resolve().parent / "chroma_db"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_DB_PATH = REPO_ROOT / "databases" / "good" / "chroma_db"
 COLLECTION_NAME = "knowledge_base"
 TOP_K = 5
 
 
-def search(query: str, top_k: int = TOP_K):
+def search(query: str, db_path: Path, top_k: int = TOP_K):
     """Возвращает top_k наиболее релевантных чанков для запроса."""
-    client = chromadb.PersistentClient(path=str(CHROMA_PATH))
+    client = chromadb.PersistentClient(path=str(db_path))
     collection = client.get_collection(name=COLLECTION_NAME)
     query_embedding = get_embedding(query, text_type="query").tolist()
     results = collection.query(
@@ -29,9 +30,14 @@ def search(query: str, top_k: int = TOP_K):
 
 
 def main():
-    if len(sys.argv) > 1:
-        query = " ".join(sys.argv[1:])
-        queries = [query]
+    parser = argparse.ArgumentParser(description="Пример поиска по ChromaDB индексу.")
+    parser.add_argument("query", nargs="*", help="Поисковый запрос (если не передан, запускаются тестовые)")
+    parser.add_argument("--db-path", type=Path, default=DEFAULT_DB_PATH, help="Путь к папке ChromaDB")
+    parser.add_argument("--top-k", type=int, default=TOP_K, help="Количество возвращаемых чанков")
+    args = parser.parse_args()
+
+    if args.query:
+        queries = [" ".join(args.query)]
     else:
         queries = [
             "Как варить пельмени на сильном огне?",
@@ -42,7 +48,7 @@ def main():
     for q in queries:
         print("Запрос:", q)
         print("-" * 60)
-        res = search(q)
+        res = search(q, db_path=args.db_path, top_k=args.top_k)
         docs = res["documents"][0]
         metas = res["metadatas"][0]
         dists = res["distances"][0]

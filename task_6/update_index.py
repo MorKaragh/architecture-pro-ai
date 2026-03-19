@@ -32,7 +32,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 DEFAULT_SOURCE_DIR = REPO_ROOT / "task_6" / "source_docs"
-DEFAULT_CHROMA_PATH = REPO_ROOT / "task_3" / "chroma_db"
+DEFAULT_CHROMA_PATH = REPO_ROOT / "databases" / "good" / "chroma_db"
 DEFAULT_MANIFEST_PATH = REPO_ROOT / "task_6" / "state.json"
 DEFAULT_LOG_PATH = REPO_ROOT / "task_6" / "logs" / "index_update.jsonl"
 
@@ -246,7 +246,7 @@ def main() -> int:
     parser.add_argument("--max-retries", type=int, default=3)
     parser.add_argument("--retry-delay-sec", type=float, default=2.0)
 
-    # Полный пересчёт именно source_docs (не трогает внешний task_3/chroma_db полностью).
+    # Полный пересчёт именно source_docs (не трогает внешнюю good-базу полностью).
     parser.add_argument("--rebuild", action="store_true", help="Пересчитать source_docs заново (только для чанков этого задания)")
     args = parser.parse_args()
 

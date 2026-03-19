@@ -3,14 +3,15 @@
 Task 5: добавление «злонамеренного» документа в копию ChromaDB.
 
 Важно:
-- индекс берётся из task_5/chroma_db (копия task_3/chroma_db);
-- task_3/chroma_db НЕ трогается;
+- индекс берётся из databases/bad/chroma_db;
+- databases/good/chroma_db НЕ трогается;
 - чанки режутся теми же параметрами, что и в task_3/build_index.py.
 """
 
 from __future__ import annotations
 
 import os
+import argparse
 from pathlib import Path
 
 import chromadb
@@ -20,7 +21,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-CHROMA_PATH = Path(os.getenv("CHROMA_PATH", str(REPO_ROOT / "task_5" / "chroma_db")))
+DEFAULT_DB_PATH = REPO_ROOT / "databases" / "bad" / "chroma_db"
 COLLECTION_NAME = "knowledge_base"
 
 # Параметры чанкинга как в task_3/build_index.py
@@ -98,10 +99,20 @@ def chunk_text(text: str) -> list[str]:
 
 
 def main() -> None:
-    if not CHROMA_PATH.exists():
+    parser = argparse.ArgumentParser(description="Индексация злонамеренного документа в ChromaDB.")
+    parser.add_argument(
+        "--db-path",
+        type=Path,
+        default=Path(os.getenv("CHROMA_PATH", str(DEFAULT_DB_PATH))),
+        help="Путь к папке ChromaDB, куда добавляется злонамеренный документ",
+    )
+    args = parser.parse_args()
+    db_path = args.db_path
+
+    if not db_path.exists():
         raise FileNotFoundError(
-            f"Папка индекса не найдена: {CHROMA_PATH}. "
-            "Сначала сделайте копию task_3/chroma_db в task_5/chroma_db."
+            f"Папка индекса не найдена: {db_path}. "
+            "Сначала создайте/скопируйте базу для bad-окружения."
         )
 
     chunks = chunk_text(MALICIOUS_TEXT)
@@ -110,7 +121,7 @@ def main() -> None:
 
     ids = [f"{MALICIOUS_TITLE}_{i}" for i in range(len(chunks))]
 
-    client = chromadb.PersistentClient(path=str(CHROMA_PATH))
+    client = chromadb.PersistentClient(path=str(db_path))
     collection = client.get_collection(name=COLLECTION_NAME)
 
     # Повторный запуск: удалим старые чанки с теми же id (если поддерживается).
@@ -119,7 +130,7 @@ def main() -> None:
     except Exception:
         pass
 
-    print(f"Добавляем в коллекцию '{COLLECTION_NAME}' в {CHROMA_PATH}")
+    print(f"Добавляем в коллекцию '{COLLECTION_NAME}' в {db_path}")
     print(f"Чанков: {len(chunks)}")
 
     embeddings: list[list[float]] = []
@@ -141,7 +152,7 @@ def main() -> None:
         metadatas=metadatas,
     )
 
-    print("Готово. Злонамеренный документ проиндексирован в task_5/chroma_db.")
+    print(f"Готово. Злонамеренный документ проиндексирован в {db_path}.")
 
 
 if __name__ == "__main__":

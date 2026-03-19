@@ -23,11 +23,13 @@ architecture-pro-ai/
 │   └── venv/                # venv с requests, numpy, scipy; для task_3 туда добавлены chromadb, langchain-text-splitters
 ├── task_2/
 │   └── final_fandom/        # база знаний: .txt файлы, только чтение
+├── databases/
+│   ├── good/chroma_db/      # "хорошая" база ChromaDB
+│   └── bad/chroma_db/       # "плохая" база для prompt-injection сценариев
 └── task_3/
     ├── embedding_client.py  # клиент Yandex API (get_embedding)
     ├── build_index.py       # построение индекса: чанки → эмбеддинги → ChromaDB
     ├── query_example.py     # пример запроса к индексу
-    ├── chroma_db/           # каталог индекса ChromaDB (создаётся после первого успешного build_index.py)
     ├── requirements.txt     # chromadb, langchain-text-splitters, numpy, requests
     └── README.md            # описание задания и как запускать
 ```
@@ -53,14 +55,14 @@ architecture-pro-ai/
 
 - **Скрипт:** `task_3/build_index.py`.
 - Читает все `*.txt` из `task_2/final_fandom/` (путь задаётся относительно корня репозитория: `REPO_ROOT / "task_2" / "final_fandom"`).
-- Удаляет старую папку `task_3/chroma_db/` (если есть) и создаёт коллекцию заново.
+- Удаляет старую папку `databases/good/chroma_db/` (если есть) и создаёт коллекцию заново.
 - Коллекция ChromaDB: имя `knowledge_base`, метрика **cosine** (`configuration={"hnsw": {"space": "cosine"}}`).
 - Эмбеддинги запрашиваются **по одному** (батч-API у Yandex в коде не используется). При большом числе чанков выполнение занимает несколько минут.
 
 ### 3.4 Поиск по индексу
 
 - **Скрипт:** `task_3/query_example.py`.
-- Загружает коллекцию из `task_3/chroma_db/`, эмбеддинг запроса через `get_embedding(..., text_type="query")`, поиск по ChromaDB, вывод топ-5 чанков с метаданными и расстоянием.
+- Загружает коллекцию из `databases/good/chroma_db/`, эмбеддинг запроса через `get_embedding(..., text_type="query")`, поиск по ChromaDB, вывод топ-5 чанков с метаданными и расстоянием.
 
 ---
 
@@ -84,7 +86,7 @@ architecture-pro-ai/
 4. Проверить поиск:  
    `python query_example.py "тестовый запрос"`.
 
-Дальнейшие шаги по заданию (например, интеграция с ботом или LLM) — подключать к `task_3/embedding_client.py` и к индексу в `task_3/chroma_db/` (через ChromaDB API, как в `query_example.py`).
+Дальнейшие шаги по заданию (например, интеграция с ботом или LLM) — подключать к `task_3/embedding_client.py` и к индексу в `databases/good/chroma_db/` (через ChromaDB API, как в `query_example.py`).
 
 ---
 
@@ -106,7 +108,7 @@ architecture-pro-ai/
 
 ### 6.2 Индекс не найден при запросе
 
-- **Папки `task_3/chroma_db/` нет или она пустая**  
+- **Папки `databases/good/chroma_db/` нет или она пустая**  
   Сначала выполнить `python build_index.py` и дождаться сообщения «Индекс сохранён в ...».
 
 - **`get_collection` падает (коллекция не найдена)**  
@@ -120,7 +122,7 @@ architecture-pro-ai/
 ### 6.4 Изменение базы знаний или параметров чанков
 
 - Файлы в `task_2/final_fandom/` менять вручную можно; скрипты их только читают.
-- После изменения текстов или после смены `CHUNK_SIZE` / `CHUNK_OVERLAP` в `build_index.py` нужно заново запустить `build_index.py` — он пересоздаёт `chroma_db/` и коллекцию.
+- После изменения текстов или после смены `CHUNK_SIZE` / `CHUNK_OVERLAP` в `build_index.py` нужно заново запустить `build_index.py` — он пересоздаёт `databases/good/chroma_db/` и коллекцию.
 
 ---
 
