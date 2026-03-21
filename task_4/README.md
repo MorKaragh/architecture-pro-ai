@@ -1,52 +1,29 @@
-# Задание 4. RAG-бот с Few-shot и Chain-of-Thought
+# Задание 4 — RAG-бот (Few-shot, Chain-of-Thought)
 
-Консольный бот: поиск по векторной базе (task_3), ответы через YandexGPT с техниками Few-shot и CoT.
+Консольный бот: ChromaDB (`databases/good/chroma_db`) + шаблоны в `prompts/` + YandexGPT.
 
-## Зависимости
+## Запуск
 
-- Индекс и эмбеддинги из **task_3** (ChromaDB в `databases/good/chroma_db/`, эмбеддинги — Yandex API).
-- Вызов LLM — как в **gpt_tryout/index.py** (OpenAI-совместимый клиент, Yandex Cloud).
+Рекомендуется общий venv в **корне репозитория** и меню **`./main_interactive.sh`** (пункты для бота и индексов).
 
-## Как запустить
+Прямой запуск из корня:
 
-1. Собрать индекс в task_3 (если ещё не собран):
-   ```bash
-   cd task_3
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   export YANDEX_CLOUD_FOLDER="<folder_id>"
-   export YANDEX_IAM_TOKEN="<iam_token>"
-   python build_index.py
-   ```
+```bash
+./venv/bin/python task_4/bot.py [--db-path ПУТЬ] [--defense off|protected]
+```
 
-2. В task_4 создать venv и установить зависимости:
-   ```bash
-   cd task_4
-   python -m venv venv
-   source venv/bin/activate   # Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-3. Переменные окружения для бота (те же, что для gpt_tryout):
-   - `YANDEX_CLOUD_FOLDER` — ID каталога.
-   - `YANDEX_CLOUD_API_KEY` — для эмбеддингов (поиск) и для YandexGPT (ответы). Оба запроса идут с этим ключом.
-
-4. Запуск (из каталога **task_4**):
-   ```bash
-   python bot.py
-   ```
-   Скрипт сам подхватывает `task_3` для импорта `embedding_client` и пути к `chroma_db`.
+Переменные окружения: `YANDEX_CLOUD_FOLDER`, `YANDEX_CLOUD_API_KEY` (эмбеддинги и LLM).
 
 ## Файлы
 
-- `rag.py` — пайплайн RAG: поиск, сборка промпта из шаблонов, вызов YandexGPT.
-- `bot.py` — консольный REPL.
-- `prompts/` — шаблоны промптов (system.txt, few_shot.txt, main.txt); правка без изменения кода.
-- `DIALOGS.md` — примеры диалогов (успешные и ответ «Я не знаю»).
+| Файл / папка | Назначение |
+|--------------|------------|
+| `rag.py` | Поиск, сборка промпта, защита `protected`, вызов модели |
+| `bot.py` | REPL |
+| `prompts/system.txt` | Системная инструкция (шаги → ответ, отказ при отсутствии данных) |
+| `prompts/few_shot.txt` | Few-shot примеры |
+| `prompts/main.txt` | Шаблон с плейсхолдерами `{system}`, `{context}`, `{few_shot}`, `{user_query}` |
+| `prompts/README.md` | Краткое описание шаблонов (артефакт задания) |
+| `DIALOGS.md` | Примеры диалогов с оценкой качества (артефакт задания) |
 
-## Результат по заданию
-
-- Модуль RAG: загрузка индекса, приём запроса, поиск, промптинг (few-shot, CoT), генерация ответа.
-- Запускаемый скрипт: `python bot.py`.
-- Примеры диалогов: см. `DIALOGS.md`.
+Тон и правила меняются правкой `.txt` в `prompts/` без изменения кода.

@@ -1,42 +1,49 @@
 # architecture-pro-ai
 
-## Что сделано по заданиям
+Учебный проект: RAG-бот по обезличенной базе («Половник, выводящий из запоя»), ChromaDB, YandexGPT и Yandex Embeddings.
 
-1. `task_1` — анализ моделей и инфраструктуры
-   - Сформированы рекомендации по выбору LLM/эмбеддингов и векторной базы (см. `task_1/otchet_issledovanie_rag_infrastruktury.md`).
+---
 
-2. `task_2` — подготовка базы знаний
-   - Подготовлен набор документов `task_2/final_fandom/` (исходные `.txt`, которые используются для индексации).
+## Быстрый старт
 
-3. `task_3` — векторный индекс
-   - Скрипт `task_3/build_index.py` строит ChromaDB в `databases/good/chroma_db/` на основе документов из `task_2/final_fandom/`.
+| Шаг | Действие |
+|-----|----------|
+| 1 | Создать и активировать **`venv`** в корне репозитория, установить зависимости (`task_3/requirements.txt` и пакеты для `task_4` по необходимости). |
+| 2 | Задать **`YANDEX_CLOUD_FOLDER`**, **`YANDEX_CLOUD_API_KEY`** (и при работе `task_3` через IAM — **`YANDEX_IAM_TOKEN`**). |
+| 3 | Собрать основной индекс: **`./utils/run_task3_build_index.sh`** (или пункт меню **6**). |
+| 4 | Запустить интерактивное меню: **`./main_interactive.sh`**. |
 
-4. `task_4` — RAG-бот (few-shot)
-   - Реализован пайплайн RAG: поиск по ChromaDB + сборка промпта по шаблонам из `task_4/prompts/` + генерация ответа через YandexGPT.
-   - Запуск: консольный REPL `task_4/bot.py` (режим защиты включается параметром `--defense off|protected`).
+Меню вызывает сценарии из каталога **`utils/`** (боты, индексация, задания 3–7). Список имён файлов `utils/run_*.sh` совпадает с пунктами меню.
 
-5. `task_5` — демонстрация prompt-injection и защит
-   - Сделана отдельная “плохая” база: `databases/bad/chroma_db` (оригинальная good-база не портится).
-   - Добавлен “злонамеренный” документ `task_5/malicious_doc.txt`, он проиндексирован скриптом `task_5/index_malicious_doc.py` в `databases/bad/chroma_db`.
-   - В `task_4/rag.py` добавлены режимы:
-     - `off` — без защит: демонстрирует уязвимость (бот может вывести `swordfish`).
-     - `protected` — Pre-prompt + post-filter/sanitization: подозрительные чанки отбрасываются, утечка не происходит.
+---
+
+## Задания (wiki)
+
+В каждой папке **`task_N/`** есть **`TASK.md`** (постановка курса, не редактировать), **`REPORT.md`** (краткий отчёт для ревьюера) и при необходимости **`README.md`** (как запускать локальные шаги). Отдельные **Markdown-артефакты** постановки (например `task_1/otchet_*.md`, `task_2/kimetsu_articles/DICTIONARY.md`, `task_4/DIALOGS.md`, `task_5/LOG_EXECUTION.md`, `task_6/LOG_EXECUTION.md`, `task_4/prompts/README.md`) **не удаляются** — они часть сдачи.
+
+| Задание | Суть | Документы |
+|---------|------|-----------|
+| **1** | Сравнение LLM, эмбеддингов, векторных БД; конфигурации сервера | [TASK](task_1/TASK.md) · [REPORT](task_1/REPORT.md) · [отчёт-исследование](task_1/otchet_issledovanie_rag_infrastruktury.md) |
+| **2** | Корпус `.txt`, словарь замен, материалы подготовки | [TASK](task_2/TASK.md) · [REPORT](task_2/REPORT.md) · [README](task_2/README.md) |
+| **3** | Чанкинг, эмбеддинги Yandex, ChromaDB в `databases/good/chroma_db` | [TASK](task_3/TASK.md) · [REPORT](task_3/REPORT.md) · [README](task_3/README.md) |
+| **4** | RAG + промпты + REPL, режим защиты от injection | [TASK](task_4/TASK.md) · [REPORT](task_4/REPORT.md) · [README](task_4/README.md) |
+| **5** | Вредоносный документ в `databases/bad`, демо утечки / защиты | [TASK](task_5/TASK.md) · [REPORT](task_5/REPORT.md) · [README](task_5/README.md) |
+| **6** | Инкрементальное обновление индекса, лог JSONL, cron | [TASK](task_6/TASK.md) · [REPORT](task_6/REPORT.md) · [README](task_6/README.md) |
+| **7** | Gap-индекс, golden-набор, автооценка, логи, диаграмма | [TASK](task_7/TASK.md) · [REPORT](task_7/REPORT.md) · [README](task_7/README.md) |
+
+---
+
+## Структура (кратко)
+
+- **`databases/good/chroma_db`** — основной индекс базы знаний.  
+- **`databases/bad/chroma_db`** — индекс с вредоносным чанком (задание 5).  
+- **`task_7/chroma_db_gap`** — индекс без части сущностей (задание 7).  
+- **`utils/`** — оболочки запуска сценариев из корня.
+
+---
 
 ## Переменные окружения
 
-Нужны для работы с Yandex:
-- `YANDEX_CLOUD_FOLDER`
-- `YANDEX_CLOUD_API_KEY`
-- `YANDEX_IAM_TOKEN` 
-
-## Запуск сценариев
-
-Интерактивное меню (боты, индексация, задания 3–7):
-
-- `./main_interactive.sh` — главное меню интерактивной работы со сценариями
-
-Прямой запуск отдельных сценариев — скрипты в `utils/` (например `utils/run_bot_normal.sh`). Полный список пунктов меню совпадает с именами `utils/run_*.sh`.
-
-Перед демонстрацией task_5 при необходимости (однократно) переиндексируйте вредоносный документ:
-
-- `./utils/run_task5_index_malicious.sh`
+- **`YANDEX_CLOUD_FOLDER`** — идентификатор каталога в Yandex Cloud.  
+- **`YANDEX_CLOUD_API_KEY`** — ключ для YandexGPT и эмбеддингов в `task_4` / общем пайплайне.  
+- **`YANDEX_IAM_TOKEN`** — для `task_3/embedding_client.py` и `build_index.py`, если используется схема с IAM.

@@ -15,6 +15,7 @@
 
 Лог пишется в JSONL: `task_6/logs/index_update.jsonl` (одна запись на один запуск).
 Для фиксации артефакта в репозитории дополнительно сохранён пример записи: `task_6/index_update_sample.jsonl`.
+Пример записи в читаемом виде (Markdown) — [`LOG_EXECUTION.md`](LOG_EXECUTION.md).
 
 В записи присутствуют поля:
 - `start_time`, `end_time`;
@@ -57,5 +58,6 @@
   - `task_6/update_index.sh`
   - `task_6/architecture.puml`
   - `task_6/index_update_sample.jsonl`
+  - `task_6/LOG_EXECUTION.md`
 - Проверено соответствие структуры лога требованиям постановки (время, размеры, чанки, ошибки).
 

@@ -1,5 +1,7 @@
 # Задание 3. Векторный индекс базы знаний
 
+**Быстрый запуск из корня репозитория** (общий `venv`): `./utils/run_task3_build_index.sh`, `./utils/run_task3_query_example.sh "ваш запрос"`.
+
 ## Модель эмбеддингов
 
 - **Название:** Yandex Foundation Models — `text-search-doc` (для документов/чанков) и `text-search-query` (для запросов).

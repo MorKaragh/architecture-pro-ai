@@ -10,7 +10,7 @@
 
 ## Артефакт
 
-- Основной документ: `task_1/otchet_issledovanie_rag_infrastruktury.md`.
+- Полный текст исследования (с таблицами и выводами): [`otchet_issledovanie_rag_infrastruktury.md`](otchet_issledovanie_rag_infrastruktury.md).
 
 ## Ключевой вывод
 
