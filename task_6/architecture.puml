@@ -1,0 +1,22 @@
+@startuml
+title Task 6: Автоматическое ежедневное обновление базы знаний
+
+rectangle "Источник данных\n(task_6/source_docs/*.txt)" as Source
+rectangle "cron (или планировщик)" as Cron
+rectangle "update_index.py" as Script
+rectangle "Чанкинг" as Chunker
+rectangle "Эмбеддинги" as Embeddings
+rectangle "ChromaDB\nonline: databases/good/chroma_db\ncollection: knowledge_base\nstub: task_6/chroma_db_stub" as Index
+rectangle "Логи\n(task_6/logs/index_update.jsonl)" as Logs
+
+Cron --> Script : запускает задачу (например, каждый день 06:00)
+Source --> Script : новые/изменённые документы
+Script --> Chunker : текст -> чанки
+Chunker --> Script : список чанков
+Script --> Embeddings : чанки -> векторы
+Embeddings --> Script : embeddings
+Script --> Index : add/delete чанки
+Script --> Logs : JSON запись о прогоне
+
+@enduml
+

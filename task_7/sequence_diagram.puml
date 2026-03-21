@@ -1,0 +1,40 @@
+@startuml
+title Task 7: Оценка покрытия RAG (sequential flow)
+
+actor User
+participant "evaluate.py" as Eval
+participant "RAG search()" as Search
+database "ChromaDB\n(task_7/chroma_db_gap)" as DB
+participant "RAG answer()" as Answer
+collections "logs/eval_logs.jsonl" as Logs
+collections "logs/eval_summary.json" as Summary
+
+User -> Eval: Запуск теста по golden_questions.txt
+loop Для каждого вопроса
+  Eval -> Search: search(query, db_path=task_7/chroma_db_gap)
+  Search -> DB: Query top_k chunks
+  DB --> Search: chunks + metadata + distances
+  Search --> Eval: chunks_found + sources
+
+  Eval -> Answer: answer(query, db_path=task_7/chroma_db_gap)
+  Answer -> DB: Повторный retrieval для генерации
+  DB --> Answer: контекст
+  Answer --> Eval: текст ответа
+
+  Eval -> Eval: Оценка флагов\n(successful_answer/evaluation_pass)
+  Eval -> Logs: append JSON record
+end
+
+Eval -> Eval: Агрегация метрик\n(accuracy, failed topics)
+Eval -> Summary: write summary JSON
+Eval --> User: Итоговая статистика
+
+note right of DB
+Точки возможного сбоя:
+- пустой индекс/коллекция
+- нерелевантные чанки
+- отсутствующая сущность
+- ошибки генерации ответа
+end note
+
+@enduml

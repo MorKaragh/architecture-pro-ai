@@ -1,0 +1,18 @@
+{
+  "source_dir": "/media/sergei/36756e2b-4aaa-4cd5-bb40-f5d2488ae409/yandex-architecture-course/architecture-pro-ai/task_2/final_fandom",
+  "db_path": "/media/sergei/36756e2b-4aaa-4cd5-bb40-f5d2488ae409/yandex-architecture-course/architecture-pro-ai/task_7/chroma_db_gap",
+  "collection_name": "knowledge_base",
+  "exclude_requested": [
+    "Варка_при_луне",
+    "Константин",
+    "Марк_Козлов"
+  ],
+  "exclude_found": [
+    "Варка_при_луне",
+    "Константин",
+    "Марк_Козлов"
+  ],
+  "files_included": 31,
+  "chunks_total": 311,
+  "embedding_elapsed_sec": 461.745
+}
