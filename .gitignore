@@ -216,3 +216,5 @@ task_6/chroma_db/
 task_6/chroma_db_stub/
 task_6/state.json
 task_6/logs/
+
+restructure-main-for-pr.sh
