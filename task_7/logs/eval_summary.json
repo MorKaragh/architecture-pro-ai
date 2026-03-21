@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-03-19T23:02:56.308995+00:00",
-  "db_path": "task_7/chroma_db_gap",
-  "questions_path": "task_7/golden_questions.txt",
+  "timestamp": "2026-03-21T20:40:30.678896+00:00",
+  "db_path": "/media/sergei/36756e2b-4aaa-4cd5-bb40-f5d2488ae409/yandex-architecture-course/architecture-pro-ai/task_7/chroma_db_gap",
+  "questions_path": "/media/sergei/36756e2b-4aaa-4cd5-bb40-f5d2488ae409/yandex-architecture-course/architecture-pro-ai/task_7/golden_questions.txt",
   "log_path": "/media/sergei/36756e2b-4aaa-4cd5-bb40-f5d2488ae409/yandex-architecture-course/architecture-pro-ai/task_7/logs/eval_logs.jsonl",
   "total_questions": 12,
   "expected_yes": 8,

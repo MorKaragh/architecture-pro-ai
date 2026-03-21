@@ -6,21 +6,17 @@ Task 7: автоматическая проверка RAG по golden-набор
 from __future__ import annotations
 
 import argparse
-import datetime as dt
 import json
 import sys
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DB_PATH = REPO_ROOT / "task_7" / "chroma_db_gap"
-DEFAULT_QUESTIONS = REPO_ROOT / "task_7" / "golden_questions.txt"
-DEFAULT_LOG_PATH = REPO_ROOT / "task_7" / "logs" / "eval_logs.jsonl"
-DEFAULT_SUMMARY_PATH = REPO_ROOT / "task_7" / "logs" / "eval_summary.json"
-
-
-def _iso_now() -> str:
-    return dt.datetime.now(dt.timezone.utc).isoformat()
+TASK_7 = REPO_ROOT / "task_7"
+DEFAULT_DB_PATH = TASK_7 / "chroma_db_gap"
+DEFAULT_QUESTIONS = TASK_7 / "golden_questions.txt"
+DEFAULT_LOG_PATH = TASK_7 / "logs" / "eval_logs.jsonl"
+DEFAULT_SUMMARY_PATH = TASK_7 / "logs" / "eval_summary.json"
 
 
 def _load_rag():
@@ -61,20 +57,9 @@ def parse_golden(path: Path) -> list[dict]:
     return out
 
 
-def _is_successful_answer(text: str, min_len: int) -> bool:
-    if not text or len(text.strip()) < min_len:
-        return False
-    low = text.lower()
-    deny_markers = (
-        "я не знаю",
-        "не найдено",
-        "нет данных",
-        "не могу ответить",
-    )
-    return not any(m in low for m in deny_markers)
-
-
 def main() -> int:
+    from rag_logging import is_successful_answer, iso_now
+
     parser = argparse.ArgumentParser(description="Evaluate RAG with logging for task_7")
     parser.add_argument("--db-path", type=Path, default=DEFAULT_DB_PATH)
     parser.add_argument("--questions-path", type=Path, default=DEFAULT_QUESTIONS)
@@ -103,7 +88,7 @@ def main() -> int:
             else:
                 expected_no += 1
 
-            timestamp = _iso_now()
+            timestamp = iso_now()
             search_error = None
             chunks_found = 0
             sources: list[str] = []
@@ -123,7 +108,7 @@ def main() -> int:
                 bot_answer = f"ERROR: {e!r}"
 
             response_len = len(bot_answer.strip())
-            success_flag = _is_successful_answer(bot_answer, args.min_success_len)
+            success_flag = is_successful_answer(bot_answer, args.min_success_len)
             expected_ok = (should_have and success_flag) or ((not should_have) and (not success_flag))
             if expected_ok:
                 hits += 1
@@ -147,7 +132,7 @@ def main() -> int:
             print(f"[{idx}/{total}] pass={expected_ok} chunks={chunks_found} q={query}")
 
     summary = {
-        "timestamp": _iso_now(),
+        "timestamp": iso_now(),
         "db_path": str(args.db_path),
         "questions_path": str(args.questions_path),
         "log_path": str(args.log_path),

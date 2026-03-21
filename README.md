@@ -29,12 +29,14 @@
 - `YANDEX_CLOUD_API_KEY`
 - `YANDEX_IAM_TOKEN` 
 
-## Запуск бота
+## Запуск сценариев
 
-Используйте удобные скрипты в корне:
-- `./run_bot_normal.sh` — нормальная база (`databases/good/chroma_db`), режим `--defense off`
-- `./run_bot_bad_protected.sh` — плохая база (`databases/bad/chroma_db`), безопасный режим `--defense protected`
-- `./run_bot_bad_unsafe.sh` — плохая база (`databases/bad/chroma_db`), небезопасный режим `--defense off`
+Интерактивное меню (боты, индексация, задания 3–7):
 
-Перед запуском task_5 при необходимости можно (однократно) переиндексировать “злонамеренный” документ:
-- `task_5/venv/bin/python task_5/index_malicious_doc.py`
+- `./main_interactive.sh` — главное меню интерактивной работы со сценариями
+
+Прямой запуск отдельных сценариев — скрипты в `utils/` (например `utils/run_bot_normal.sh`). Полный список пунктов меню совпадает с именами `utils/run_*.sh`.
+
+Перед демонстрацией task_5 при необходимости (однократно) переиндексируйте вредоносный документ:
+
+- `./utils/run_task5_index_malicious.sh`
